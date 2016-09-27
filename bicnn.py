@@ -52,9 +52,9 @@ class KMaxPooling2D(F.pooling.pooling_2d.Pooling2D):
         img = x[0]
         n, c, h, w = img.shape
         indexes = np.sort(np.argsort(-img)[:, :, :, :self.k])
-        indexes += np.arange(h).reshape((h, 1)) * w
+        indexes += np.arange(0, img.size, step=w).repeat(self.k).reshape(n, c, h, self.k)
         self.indexes = indexes
-        y = np.take(x, indexes)
+        y = np.take(img, indexes)
         return y,
 
     def backward(self, x, gy):
