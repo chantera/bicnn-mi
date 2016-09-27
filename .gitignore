@@ -94,3 +94,4 @@ ENV/
 # project own settings
 zzz.trash/
 logs/
+sample/embeddings-*
