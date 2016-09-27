@@ -7,7 +7,6 @@ from chainer import Chain, Function
 import chainer.functions as F
 import chainer.links as L
 import chainer.utils as U
-from chainer import reporter
 
 
 class Similarity(Function):
@@ -343,53 +342,12 @@ class BiCNN(Chain):
         )
 
 
-class Classifier(Chain):
-    compute_accuracy = True
+class Classifier(L.Classifier):
 
     def __init__(self, predictor):
         assert isinstance(predictor, BiCNN)
-        super(Classifier, self).__init__(predictor=predictor)
-        self.lossfun = F.sigmoid_cross_entropy
-        self.accfun = accuracy
-        self.y = None
-        self.loss = None
-        self.accuracy = None
-
-    def __call__(self, *args):
-        """Computes the loss value for an input and label pair.
-
-        It also computes accuracy and stores it to the attribute.
-
-        Args:
-            args (list of ~chainer.Variable): Input minibatch.
-
-        The all elements of ``args`` but last one are features and
-        the last element corresponds to ground truth labels.
-        It feeds features to the predictor and compare the result
-        with ground truth labels.
-
-        Returns:
-            ~chainer.Variable: Loss value.
-
-        """
-
-        assert len(args) >= 2
-        x = args[:-1]
-        t = args[-1]
-        self.y = None
-        self.loss = None
-        self.accuracy = None
-        self.y = self.predictor(*x)
-        self.loss = self.lossfun(self.y, t)
-        reporter.report({'loss': self.loss}, self)
-        if self.compute_accuracy:
-            self.accuracy = self.accfun(self.y, t)
-            reporter.report({'accuracy': self.accuracy}, self)
-        return self.loss
-
-
-def accuracy(y, t):
-    """Computes binary classification accuracy of the minibatch."""
-    y = F.sigmoid(y)
-    pred = np.array(y.data >= 0.5, dtype=t.dtype)
-    return np.array((pred == t.data).mean(dtype=t.dtype)),
+        super(Classifier, self).__init__(
+            predictor=predictor,
+            lossfun=F.sigmoid_cross_entropy,
+            accfun=F.evaluation.binary_accuracy.binary_accuracy,
+        )

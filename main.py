@@ -47,8 +47,8 @@ class MsrpCorpusPreprocessor(Preprocessor):
 def load_msrp_corpus(path):
     X = []
     y = []
-    with open(path) as f:
-        next(f)  # skip header line
+    with open(path, encoding="utf_8_sig") as f:
+        # next(f)  # skip header line
         for line in f:
             cols = line.strip().split("\t")  # Quality	#1 ID	#2 ID	#1 String	#2 String
             y.append(cols[0])
