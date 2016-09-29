@@ -184,10 +184,8 @@ class BiCNN(Chain):
     https://aclweb.org/anthology/N/N15/N15-1091.pdf
     """
 
-    def __init__(self, channels, filter_width, embeddings, max_sentence_length, k_top, beta, pool_size):
+    def __init__(self, channels, filter_width, embeddings, k_top, beta, pool_size):
         vocab_size, embed_size = embeddings.shape
-        maxlen = max_sentence_length
-        assert maxlen % 2 == 0
         feature_size = [
             pool_size[0][0] * pool_size[0][1],
             pool_size[1][0] * pool_size[1][1] * channels[0],
@@ -240,7 +238,6 @@ class BiCNN(Chain):
         # self._feature_size = feature_size
         self._vocab_size = vocab_size
         self._embed_size = embed_size
-        self._max_sentence_length = maxlen
         self._k_top = k_top
         self._beta = beta
         self._pool_size = pool_size

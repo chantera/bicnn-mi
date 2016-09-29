@@ -88,7 +88,6 @@ def train(
         channels=[3, 5],
         filter_width=[6, 14],
         embeddings=processor.embeddings,
-        max_sentence_length=processor.max_sentence_length,
         k_top=4,
         beta=2,
         pool_size=[(10, 10), (10, 10), (6, 6), (2, 2)]
