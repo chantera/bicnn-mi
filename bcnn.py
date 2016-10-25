@@ -39,7 +39,7 @@ class BCNN(Chain):
         C0 = self.conv(E0)
         C1 = self.conv(E1)
         A0 = F.average_pooling_2d(C0, ksize=(1, C0.shape[3]), stride=None, pad=0, use_cudnn=True)
-        A1 = F.average_pooling_2d(C0, ksize=(1, C1.shape[3]), stride=None, pad=0, use_cudnn=True)
+        A1 = F.average_pooling_2d(C1, ksize=(1, C1.shape[3]), stride=None, pad=0, use_cudnn=True)
 
         y = self.linear(self._concat([A0, A1]))
         return F.reshape(y, (y.size, ))
