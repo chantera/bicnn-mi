@@ -5,7 +5,8 @@ from chainer import datasets, iterators, optimizers, training
 from chainer.training import extensions as E
 import numpy as np
 from preprocessor import Preprocessor
-from bicnn import BiCNN, Classifier
+from bicnn import BiCNN, Classifier as BiClassifier
+from bcnn import BCNN, Classifier as BClassifier
 import os
 import sys
 
@@ -62,7 +63,8 @@ def train(
         train_file,
         test_file,
         n_epoch=20,
-        batch_size=70):
+        batch_size=70,
+        model=1):
 
     # Load files
     print("init preprocessor with %s" % embed_file)
@@ -84,14 +86,23 @@ def train(
     X_test = processor.transform(X_test_raw)
 
     # Set up a neural network to train
-    model = Classifier(BiCNN(
-        channels=[3, 5],
-        filter_width=[6, 14],
-        embeddings=processor.embeddings,
-        k_top=4,
-        beta=2,
-        pool_size=[(10, 10), (10, 10), (6, 6), (2, 2)]
-    ))
+    if model == 2:
+        print("use BCNN model")
+        model = BClassifier(BCNN(
+            channels=3,
+            filter_width=3,
+            embeddings=processor.embeddings,
+        ))
+    else:
+        print("use BiCNN model")
+        model = BiClassifier(BiCNN(
+            channels=[3, 5],
+            filter_width=[6, 14],
+            embeddings=processor.embeddings,
+            k_top=4,
+            beta=2,
+            pool_size=[(10, 10), (10, 10), (6, 6), (2, 2)]
+        ))
 
     # Setup an optimizer
     optimizer = optimizers.AdaGrad(lr=0.01)
@@ -128,7 +139,8 @@ def main(argv):
         'train_file': basedir + "/sample/msr_paraphrase_train-small.txt",
         'test_file': basedir + "/sample/msr_paraphrase_test-small.txt",
         'n_epoch': 20,
-        'batch_size': 10
+        'batch_size': 10,
+        'model': int(argv[1]) if len(argv) > 1 else 1
     }
     train(**sample)
 
